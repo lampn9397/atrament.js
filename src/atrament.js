@@ -135,7 +135,7 @@ module.exports = class Atrament extends AtramentEventTarget {
 
     // set internal canvas params
     this.context = this.canvas.getContext('2d');
-    this.context.globalCompositeOperation = 'source-over';
+    this.context.globalCompositeOperation = 'xor';
     this.context.globalAlpha = 1;
     this.context.strokeStyle = config.color || 'rgba(0,0,0,1)';
     this.context.lineCap = 'round';
@@ -157,6 +157,9 @@ module.exports = class Atrament extends AtramentEventTarget {
 
     this._mode = DrawingMode.DRAW;
     this.adaptiveStroke = true;
+
+    this.drawingTime = Date.now();
+    this.drawingDelayTime = 200;
 
     // update from config object
     ['weight', 'smoothing', 'adaptiveStroke', 'mode']
@@ -218,6 +221,9 @@ module.exports = class Atrament extends AtramentEventTarget {
    * @param {number} prevY previous Y coordinate
    */
   draw(x, y, prevX, prevY) {
+    // const now = Date.now();
+    // if (now - this.drawingTime < this.drawingDelayTime) return;
+
     if (this.recordStrokes) {
       this.strokeMemory.push(new Point(x, y));
     }
@@ -263,6 +269,15 @@ module.exports = class Atrament extends AtramentEventTarget {
     context.stroke();
 
     return { x: procX, y: procY };
+  }
+
+  get globalAlpha() {
+    return this.context.globalAlpha;
+  }
+
+  set globalAlpha(c) {
+    if (typeof c !== 'number') throw new Error('wrong argument type');
+    this.context.globalAlpha = c;
   }
 
   get color() {
